@@ -15,3 +15,26 @@ Both support only hard clustering; at present there is no metric for soft cluste
 it does not require that both clusterings have the same number of clusters, and it scales reasonably well when there are many clusters.
 
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) contains additional evaluation metrics. Its `mutualinfo(x, y; normed=true)` is closest to this package's `ami`; see the AMI paper for details on the differences.
+
+## Benchmarking Clustering.jl
+
+`ami` scores were computed for several algorithms in Clustering.jl on a subset of the Gagolewski collection (see `demos/bench_clustering.jl` for details). The results are shown below:
+
+![ami scores](demos/ami.png)
+
+Higher AMI score is better.
+
+Some algorithms depend on computing the pairwise distance matrix, and thus scale poorly for large data sets.
+For these algorithms, any data set with more than 3000 points was excluded. Here were the number of benchmarks that were runnable for each algorithm:
+
+```
+5×2 DataFrame
+ Row │ Algorithm  Count
+     │ Any        Int64
+─────┼──────────────────
+   1 │ kmeans        45
+   2 │ kmedoids      27
+   3 │ hclust        27
+   4 │ affprop       27
+   5 │ dbscan        26
+```
