@@ -3,7 +3,7 @@
     score = nca(C)
 
 Compute the Normalised Clustering Accuracy (NCA) of a clustering `clust` with respect to the "ground truth" `refclust`.
-Alternatively supply the confusion matrix `C` (see [`confusion_matrix`](@ref)).
+Alternatively supply the contingency matrix `C` (see [`contingency_matrix`](@ref)).
 
 !!! note
     The NCA assumes hard-clustering and requires that the number of clusters in `refclust` and `clust`
@@ -31,14 +31,14 @@ function nca(C::AbstractMatrix{Int})
     return ncamax
 end
 
-nca(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer}) = nca(confusion_matrix(refclust, clust))
+nca(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer}) = nca(contingency_matrix(refclust, clust))
 
 """
     score = ami(refclust, clust)
     score = ami(C)
 
 Compute the Adjusted Mutual Information (AMI) of a clustering `clust` with respect to the "ground truth" `refclust`.
-Alternatively supply the confusion matrix `C` (see [`confusion_matrix`](@ref)).
+Alternatively supply the contingency matrix `C` (see [`contingency_matrix`](@ref)).
 
 !!! note
     AMI assumes hard-clustering.
@@ -51,17 +51,18 @@ function ami(C::AbstractMatrix{Int})
     entropy(v) = -sum(x * log(x) for x in v if !iszero(x))
 
     ax1, ax2 = axes(C)
+    i1, j1 = first(ax1), first(ax2)
     N = sum(C)
     N > 1 || return 0.0
     mi = emi = 0.0
     a = sum(C, dims=2)
     b = sum(C, dims=1)
     for i in ax1
-        ai = a[i]
+        ai = a[i, j1]
         for j in ax2
             cij = C[i, j]
             cij > 0 || continue
-            bj = b[j]
+            bj = b[i1, j]
             mi += (cij / N) * log((N * cij) / (ai * bj))
             for k in max(ai + bj - N, 1) : min(ai, bj)
                 f = exp(logfactorial(ai) + logfactorial(bj) + logfactorial(N - ai) + logfactorial(N - bj) - logfactorial(k) - logfactorial(ai - k) - logfactorial(bj - k) - logfactorial(N - ai - bj + k) - logfactorial(N))
@@ -71,17 +72,17 @@ function ami(C::AbstractMatrix{Int})
     end
     return (mi - emi) / (sqrt(entropy(a / N) * entropy(b / N)) - emi)
 end
-ami(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer}) = ami(confusion_matrix(refclust, clust))
+ami(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer}) = ami(contingency_matrix(refclust, clust))
 
 """
-    C = confusion_matrix(refclust, clust)
+    C = contingency_matrix(refclust, clust)
 
-Compute the confusion matrix of a clustering `clust` with respect to the "ground truth" `refclust`.
+Compute the contingency matrix of a clustering `clust` with respect to the "ground truth" `refclust`.
 Both `refclust` and `clust` are vectors of cluster labels (integers).
 
 `C[i, j]` is the number of objects that are in cluster `i` in `refclust` and in cluster `j` in `clust`.
 """
-function confusion_matrix(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer})
+function contingency_matrix(refclust::AbstractVector{<:Integer}, clust::AbstractVector{<:Integer})
     length(refclust) == length(clust) || throw(DimensionMismatch("refclust and clust must have the same length"))
 
     e1, e2 = extrema(refclust), extrema(clust)
