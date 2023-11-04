@@ -39,4 +39,4 @@ For these algorithms, any data set with more than 3000 points was excluded. Here
    5 │ dbscan        26
 ```
 
-It is worth noting that with the exception of `dbscan`, all of these algorithms received one or more "hints" from the reference clustering (e.g., the number of clusters). `dbscan`'s hyperparameters were set to have `2d` neighbors in `d` dimensions, and the radius was chosen so that the mean point had `2d` other points within the radius.
+It is worth noting that with the exception of `dbscan`, all of these algorithms received one or more "hints" from the reference clustering (e.g., the number of clusters). `dbscan`'s hyperparameters were set to have `2d` neighbors in `d` dimensions, and the radius was set as the mean distance to the `2d`th neighbor.
