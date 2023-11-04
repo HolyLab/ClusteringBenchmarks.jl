@@ -1,0 +1,3 @@
+[deps]
+ClusteringBenchmarks = "15c254c6-2ddb-4b2d-9a51-4031ba19e45b"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"

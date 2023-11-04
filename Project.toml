@@ -1,0 +1,13 @@
+name = "ClusteringBenchmarks"
+uuid = "15c254c6-2ddb-4b2d-9a51-4031ba19e45b"
+authors = ["Tim Holy <tim.holy@gmail.com> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
