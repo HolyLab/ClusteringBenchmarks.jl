@@ -22,7 +22,7 @@ function load_gagolewski(battery, dataset)
     datafile = basename * ".data.gz"
     isfile(datafile) || error("no such file: $datafile")
     data = Matrix(gzopen(datafile) do f
-        readdlm(f, ' ', Float64, '\n')'
+        readdlm(f, Float64)'
     end)
     labels = Vector{Int}[]
     i = 0
@@ -32,7 +32,7 @@ function load_gagolewski(battery, dataset)
             break
         end
         push!(labels, gzopen(labelfile) do f
-            vec(readdlm(f, ' ', Int, '\n'))
+            vec(readdlm(f, Int))
         end)
         i += 1
     end
