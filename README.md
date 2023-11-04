@@ -18,7 +18,7 @@ it does not require that both clusterings have the same number of clusters, and 
 
 ## Benchmarking Clustering.jl
 
-`ami` scores were computed for several algorithms in Clustering.jl on a subset of the Gagolewski collection (see `demos/bench_clustering.jl` for details). The results are shown below:
+`ami` scores were computed for several algorithms in Clustering.jl on a subset of the Gagolewski collection (see `demos/bench_clustering.jl` for details). The results are shown as a violin plot below:
 
 ![ami scores](demos/ami.png)
 
