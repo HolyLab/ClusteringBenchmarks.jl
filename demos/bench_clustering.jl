@@ -62,6 +62,10 @@ df = DataFrame(dspairs)
     end
 end
 
+# Compute the number of benchmarks run with each algorithm
+notmissing(x) = !(ismissing(x) | isnan(x))
+nbenchmarks = DataFrame(Algorithm = df.Algorithm, Count = vec(sum(notmissing, Matrix(df[:,2:end]); dims=2)))
+
 function forviolin(df)
     x = Int[]
     y = Float64[]
@@ -80,5 +84,5 @@ end
 
 x, y, algs = forviolin(df)
 fig = Figure()
-ax = Axis(fig[1, 1]; xticks=(1:length(algs), algs))
+ax = Axis(fig[1, 1]; xticks=(1:length(algs), algs), ylabel="AMI score")
 violin!(ax, x, y; datalimits=(minimum(y), 1))
