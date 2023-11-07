@@ -44,10 +44,7 @@ function evaluate_dbscan(X, refclust)
     ami(refclust, dbscan(D, mean(dn); metric=nothing, min_neighbors=nn).assignments)
 end
 
-dspairs = [battery * "/" * dataset => Union{Float64,Missing}[] for (battery, dataset) in datasets]
-pushfirst!(dspairs, "Algorithm" => String[])
-df = DataFrame(dspairs)
-@showprogress desc="Algorithm" for (f, name) in ((evaluate_kmeans, "kmeans"), (evaluate_kmedoids, "kmedoids"), (evaluate_hclust, "hclust"), (evaluate_affprop, "affprop"), (evaluate_dbscan, "dbscan"))
+function add_algorithm!(df::DataFrame, f, name, datasets)
     push!(df, (Algorithm = name,), cols=:subset)
     i = 1
     @showprogress desc="Dataset " offset=1 for (battery, dataset) in datasets
@@ -56,10 +53,18 @@ df = DataFrame(dspairs)
             refclust = labelsets[1]
             df[end, i+=1] = f(data, refclust)
         catch
-            @warn "Error on $battery/$dataset: $err"
+            @warn "Error with $name on $battery/$dataset: $err"
             rethrow()
         end
     end
+    return df
+end
+
+dspairs = [battery * "/" * dataset => Union{Float64,Missing}[] for (battery, dataset) in datasets]
+pushfirst!(dspairs, "Algorithm" => String[])
+df = DataFrame(dspairs)
+@showprogress desc="Algorithm" for (f, name) in ((evaluate_kmeans, "kmeans"), (evaluate_kmedoids, "kmedoids"), (evaluate_hclust, "hclust"), (evaluate_affprop, "affprop"), (evaluate_dbscan, "dbscan"))
+    add_algorithm!(df, f, name, datasets)
 end
 
 # Compute the number of benchmarks run with each algorithm
