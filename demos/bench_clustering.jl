@@ -31,9 +31,19 @@ for (battery, pattern) in gdatasets
     end
 end
 
+# Algorithms that require "hints" from the reference clustering (except for evaluation)
 evaluate_kmeans(X, refclust) = ami(refclust, kmeans(X, nclust(refclust)).assignments)
 evaluate_kmedoids(X, refclust) = size(X, 2) < 3000 ? ami(refclust, kmedoids(pairwise(Euclidean(), X), nclust(refclust)).assignments) : missing
 evaluate_hclust(X, refclust) = size(X, 2) < 3000 ? ami(refclust, cutree(hclust(pairwise(Euclidean(), X)); k=nclust(refclust))) : missing
+
+# Algorithms that work without reference to the reference clustering (except for evaluation)
+function evaluate_hclust_auto(X, refclust)
+    size(X, 2) < 3000 || return missing
+    hc = hclust(pairwise(Euclidean(), X))
+    # Split at the largest gap in the dendrogram
+    idx = argmax(diff(hc.heights))
+    return ami(refclust, cutree(hc; h=mean(hc.heights[idx:idx+1])))
+end
 evaluate_affprop(X, refclust) = size(X, 2) < 3000 ? ami(refclust, affinityprop(-pairwise(Euclidean(), X)).assignments) : missing
 function evaluate_dbscan(X, refclust)
     size(X, 2) < 3000 || return missing
@@ -63,7 +73,12 @@ end
 dspairs = [battery * "/" * dataset => Union{Float64,Missing}[] for (battery, dataset) in datasets]
 pushfirst!(dspairs, "Algorithm" => String[])
 df = DataFrame(dspairs)
-@showprogress desc="Algorithm" for (f, name) in ((evaluate_kmeans, "kmeans"), (evaluate_kmedoids, "kmedoids"), (evaluate_hclust, "hclust"), (evaluate_affprop, "affprop"), (evaluate_dbscan, "dbscan"))
+@showprogress desc="Algorithm" for (f, name) in ((evaluate_kmeans, "kmeans"),
+                                                 (evaluate_kmedoids, "kmedoids"),
+                                                 (evaluate_hclust, "hclust"),
+                                                 (evaluate_hclust_auto, "hclust*"),
+                                                 (evaluate_affprop, "affprop*"),
+                                                 (evaluate_dbscan, "dbscan*"))
     add_algorithm!(df, f, name, datasets)
 end
 

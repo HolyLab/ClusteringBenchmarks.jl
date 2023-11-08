@@ -39,4 +39,10 @@ For these algorithms, any data set with more than 3000 points was excluded. Here
    5 │ dbscan        26
 ```
 
-It is worth noting that with the exception of `dbscan`, all of these algorithms received one or more "hints" from the reference clustering (e.g., the number of clusters). `dbscan`'s hyperparameters were set to have `2d` neighbors in `d` dimensions, and the radius was set as the mean distance to the `2d`th neighbor.
+Algorithms (or variants) marked with a `*` are fully automated, and do not require anything beyond the input data. The remainding algorithms received one or more "hints" from the reference clustering (e.g., the number of clusters).
+Some choices were made for the fully-automated variants:
+
+- `dbscan`'s hyperparameters were set to have `2d` neighbors in `d` dimensions, and the radius was set as the mean distance to the `2d`th neighbor.
+- `hclust*` split at the longest gap between splits in the [dendrogram](https://en.wikipedia.org/wiki/Dendrogram).
+
+There may be more optimal automation strategies than these. In particular, all algorithms can be automated by optimizing [evaluation metrics](https://juliastats.org/Clustering.jl/stable/validate.html), although one still needs to choose, e.g., the range of numbers of clusters considered.
